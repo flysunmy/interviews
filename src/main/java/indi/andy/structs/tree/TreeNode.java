@@ -236,6 +236,34 @@ public class TreeNode {
 
 
 
+    /***
+     *
+     * @Method : symmetry
+     * @Description : 转换成轴对称二叉树
+     * @param root :
+     * @return : indi.andy.structs.tree.TreeNode
+     * @author : wuzichao
+     * @CreateDate : 2020-09-21 18:08:24
+     *
+     */
+    static TreeNode symmetry(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        TreeNode temp = root.left;
+        root.left = root.right;
+        root.right = temp;
+        if (root.left != null) {
+            symmetry(root.left);
+        }
+        if (root.right != null) {
+            symmetry(root.right);
+        }
+        return root;
+    }
+
+
+
     public static void main(String[] args){
         TreeNode root = new TreeNode(10);
         TreeNode l1 = new TreeNode(6);
@@ -251,6 +279,11 @@ public class TreeNode {
 
         r1.left = r1l1;
         r1.right = r1r1;
+
+        levelOrder(root);
+        TreeNode symmetry = symmetry(root);
+        System.out.println();
+        levelOrder(symmetry);
     }
 
 
