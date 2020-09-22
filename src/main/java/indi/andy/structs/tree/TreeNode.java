@@ -263,6 +263,29 @@ public class TreeNode {
     }
 
 
+    /***
+     *
+     * @Method : createBST
+     * @Description : 有序数组构建二叉排序树   bst中序遍历是有序的
+     * @param start :
+     * @param end :
+     * @return : indi.andy.structs.tree.TreeNode
+     * @author : wuzichao
+     * @CreateDate : 2020-09-22 11:18:04
+     *
+     */
+    static TreeNode createBST(int[] arr, int start, int end) {
+        if (arr == null || arr.length == 0 || end < start) {
+            return null;
+        }
+        int mid = (start + end) >> 1;
+        TreeNode node = new TreeNode(arr[mid]);
+        node.left = createBST(arr, start, mid - 1);
+        node.right = createBST(arr, mid + 1, end);
+        return node;
+    }
+
+
 
     public static void main(String[] args){
         TreeNode root = new TreeNode(10);
@@ -284,6 +307,12 @@ public class TreeNode {
         TreeNode symmetry = symmetry(root);
         System.out.println();
         levelOrder(symmetry);
+
+
+        int[] arr = {4, 6, 8, 10,12,14,16};
+        TreeNode bst = createBST(arr, 0, arr.length - 1);
+
+        midOrderRecursive(bst);
     }
 
 
