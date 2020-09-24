@@ -1,8 +1,6 @@
 package indi.andy.structs.tree;
 
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Stack;
+import java.util.*;
 
 public class TreeNode {
     int value;
@@ -285,6 +283,54 @@ public class TreeNode {
         return node;
     }
 
+    /***
+     *
+     * @Method : validateBST
+     * @Description :  验证二叉树
+     * @param root :
+     * @return : boolean
+     * @author : wuzichao
+     * @CreateDate : 2020-09-22 11:31:35
+     *
+     */
+    static boolean validateBST(TreeNode root) {
+        if (root == null) {
+            return false;
+        }
+
+        // 二叉搜索树的中序遍历是一个递增序列，所以我们只需要把这个中序遍历保存下来，然后判断这是个递增序列即可
+        ArrayList<Integer> list = new ArrayList<>();
+        midOrderToList(root, list);
+
+        if (list == null || list.size() == 0) {
+            return false;
+        }
+
+        for (int i = 0; i < list.size() - 1; i++) {
+            if (list.get(i) > list.get(i + 1)) {
+                return false;
+            }
+        }
+
+        return true;
+
+    }
+
+    static void midOrderToList(TreeNode root, List<Integer> list) {
+
+        if (root == null) {
+            return ;
+        }
+        if (root.left != null) {
+            midOrderToList(root.left, list);
+        }
+        list.add(root.value);
+        if (root.right != null) {
+            midOrderToList(root.right, list);
+        }
+
+
+    }
 
 
     public static void main(String[] args){
@@ -303,16 +349,17 @@ public class TreeNode {
         r1.left = r1l1;
         r1.right = r1r1;
 
-        levelOrder(root);
+     /*   levelOrder(root);
         TreeNode symmetry = symmetry(root);
         System.out.println();
-        levelOrder(symmetry);
+        levelOrder(symmetry);*/
 
 
         int[] arr = {4, 6, 8, 10,12,14,16};
         TreeNode bst = createBST(arr, 0, arr.length - 1);
 
-        midOrderRecursive(bst);
+        System.out.println(validateBST(bst));
+        System.out.println(validateBST(root));
     }
 
 
