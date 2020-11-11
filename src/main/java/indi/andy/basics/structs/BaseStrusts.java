@@ -1,5 +1,8 @@
 package indi.andy.basics.structs;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 public class BaseStrusts {
 
     public static void main(String[] args){
@@ -27,6 +30,19 @@ public class BaseStrusts {
         System.out.println(m);
 
 
+        ArrayList<Integer> list = new ArrayList<>();
+        list.add(9);
+        list.add(3);
+        list.add(4);
+        list.add(2);
+        System.out.println(list);
+
+        HashSet<Integer> integers = new HashSet<>();
+        integers.add(9);
+        integers.add(3);
+        integers.add(4);
+        integers.add(2);
+        System.out.println(integers);
     }
 }
 

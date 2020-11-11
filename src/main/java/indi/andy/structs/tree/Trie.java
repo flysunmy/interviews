@@ -10,6 +10,23 @@ import java.util.Map;
  * 正向最大匹配
  */
 public class Trie {
+
+    private static int num = 1;
+
+    static {
+        System.out.println("static code block");
+        System.out.println(" static field num : " + num);
+    }
+
+    {
+        System.out.println("non-static code block");
+
+    }
+
+    public Trie() {
+        System.out.println("indi.andy.structs.tree.Trie init...");
+    }
+
     static class Node {
         //记录当前节点的字
         char c;
@@ -144,8 +161,9 @@ public class Trie {
         tree.insert("中国");
         tree.insert("中国人民");
         tree.insert("中关村");
+        tree.insert("中国北京海淀区中国人民中关村");
 
-        String word = "中国";
+        String word = "中关";
         //查找该词是否存在 Trie Tree 中
         boolean flag = tree.search(word);
         if (flag) {
@@ -155,7 +173,8 @@ public class Trie {
         }
 
         //分词
-        Map<String, Integer> map = tree.tokenizer("中国人民，中国首都是北京，中关村在海淀区,中国北京天安门。中国人");
+//        Map<String, Integer> map = tree.tokenizer("中国人民，中国首都是北京，中关村在海淀区,中国北京天安门。中国人");
+        Map<String, Integer> map = tree.tokenizer("中国北京海淀区中国人民中关村");
         for (Map.Entry<String, Integer> entry : map.entrySet()) {
             System.out.println(entry.getKey() + ":" + entry.getValue());
         }
