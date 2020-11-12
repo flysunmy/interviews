@@ -3,13 +3,16 @@ package indi.andy.basics.thread.atomic;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author andy
  * b 的实现实际就是 AtomicInteger的实现  主要用到了Unsafe类直接操作内存, while自旋锁一直去比较
- * 但是 c的实现貌似也没有测试出问题, c不是volatile的,但实际unsafe.getAndAddInt 方法里面是调用了 unsafe.getIntVolatile 方法 ,可能也是保证了c的可见性
- * 可能AtomicIneger 类中的value值 加不加volatile 都能保证最终结果正确?
+ * 但是 c的实现貌似也没有测试出问题, c不是volatile的,但是也是保证了c的可见性
+ * 可能AtomicIneger 类中的value值 加不加volatile 都能保证最终结果正确? 可能和汇编指令有关?
 
  */
 public class AtomicExample {
@@ -18,9 +21,12 @@ public class AtomicExample {
     private volatile int b = 0;
     private int c = 0;
 
+    static AtomicNotVolatileInteger atomicNotVolatileInteger = new AtomicNotVolatileInteger(0);
+
 //    static Integer b = new Integer(0);
     public static void main(String[] args) throws Exception {
-
+        int threads = 20000;
+        CountDownLatch countDownLatch = new CountDownLatch(threads);
 
         Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
         theUnsafe.setAccessible(true);
@@ -29,55 +35,39 @@ public class AtomicExample {
         long offset1 = unsafe.objectFieldOffset(AtomicExample.class.getDeclaredField("c"));
 
         AtomicExample atomicExample = new AtomicExample();
-        Thread thread = new Thread(() -> {
+
+        ExecutorService pool = Executors.newCachedThreadPool();
+
+
+
+        Runnable runnable = () -> {
             for (int i = 0; i < 1000; i++) {
-
-
-                try {
-                    Thread.sleep(3);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-
 
                 atomicInteger.getAndAdd(1);
                 a++;
                 unsafe.getAndAddInt(atomicExample, offset, 1);
                 getAddInt(unsafe, atomicExample, offset1, 1);
+                atomicNotVolatileInteger.getAndAdd(1);
+
             }
-        });
+            countDownLatch.countDown();
+        };
+
+        for (int i = 0; i < threads; i++) {
+            pool.submit(runnable);
+        }
 
 
-        Thread thread1 = new Thread(() -> {
-            for (int i = 0; i < 1000; i++) {
 
-                try {
-                    Thread.sleep(3);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        countDownLatch.await();
+        System.out.println("a = " + a + ", b = " + atomicExample.b + ",  c=" + atomicExample.c +", at = " + atomicInteger + ", atomicNotVolatileInteger= " + atomicNotVolatileInteger);
+        pool.shutdown();
 
-                atomicInteger.getAndAdd(1);
-                a++;
-                unsafe.getAndAddInt(atomicExample, offset, 1);
-                getAddInt(unsafe, atomicExample, offset1, 1);
-            }
-        });
+        /*assert atomicInteger.get() == 3000;    //atomicInteger 永远是2000
 
-        thread.start();
-        thread1.start();
-
-        thread.join();
-        thread1.join();
-
-        System.out.println("a = " + a + ", b = " + atomicExample.b + ",  c=" + atomicExample.c +", at = " + atomicInteger);
-
-        assert atomicInteger.get() == 2000;    //atomicInteger 永远是2000
-
-        assert atomicExample.b == 2000;           //b 一定是 2000
-        assert a == 2000;                      // a 不一定为 2000
-        assert atomicExample.c == 2000;
+        assert atomicExample.b == 3000;           //b 一定是 2000
+        assert a == 3000;                      // a 不一定为 2000
+        assert atomicExample.c == 3000;*/
     }
 
 
